@@ -141,25 +141,69 @@ const DSParser = {
     DS_UTILS.log('Parsing description, length:', text.length);
 
     while ((match = regex.exec(text)) !== null) {
-      let url = match[1].trim();
-      if (url) {
-        // Reconstruct URL: YT auto-shortens https:// links, so the convention
-        // uses ps:// (dropping "htt") to prevent shortening. Prepend it back.
-        if (url.startsWith('ps://') || url.startsWith('p://')) {
-          url = 'htt' + url;
-          DS_UTILS.log('Reconstructed URL from YT-safe format:', url);
+      let raw = match[1].trim();
+      if (!raw) continue;
+
+      // Check for optional label: "url | Label Text"
+      // We split on the LAST standalone pipe that isn't part of the delimiter
+      let url = raw;
+      let label = null;
+
+      const pipeIdx = raw.lastIndexOf(' | ');
+      if (pipeIdx > 0) {
+        const maybUrl = raw.substring(0, pipeIdx).trim();
+        const maybLabel = raw.substring(pipeIdx + 3).trim();
+        // Only treat as label if the left side looks like a URL
+        if (maybUrl.includes('://') || maybUrl.startsWith('ps://') || maybUrl.startsWith('p://')) {
+          url = maybUrl;
+          label = maybLabel;
         }
-        matches.push(DS_UTILS.classifyUrl(url));
       }
+
+      // Reconstruct URL: YT auto-shortens https:// links, so the convention
+      // uses ps:// (dropping "htt") to prevent shortening. Prepend it back.
+      if (url.startsWith('ps://') || url.startsWith('p://')) {
+        url = 'htt' + url;
+        DS_UTILS.log('Reconstructed URL from YT-safe format:', url);
+      }
+
+      // Auto-generate label from URL path if none provided
+      if (!label) {
+        label = this._autoLabel(url);
+      }
+
+      matches.push({ ...DS_UTILS.classifyUrl(url), label });
     }
 
     if (matches.length > 0) {
       DS_UTILS.log('Found DualStream URL(s):', matches);
-      // Use the first match (primary audio source)
       this._onFoundCallbacks.forEach((cb) => cb(matches[0], matches));
     } else {
       DS_UTILS.log('No |||url||| pattern found in description');
       this._notifyCleared();
+    }
+  },
+
+  /**
+   * Auto-generate a human-readable label from a URL.
+   * e.g. "https://www.mixcloud.com/artist/english-commentary/" → "English Commentary"
+   * @param {string} url
+   * @returns {string}
+   */
+  _autoLabel(url) {
+    try {
+      const parsed = new URL(url);
+      // Get the last meaningful path segment
+      const segments = parsed.pathname.split('/').filter(Boolean);
+      if (segments.length === 0) return parsed.hostname;
+
+      const last = segments[segments.length - 1];
+      // Convert kebab-case / snake_case to Title Case
+      return last
+        .replace(/[-_]/g, ' ')
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+    } catch {
+      return 'Audio Stream';
     }
   },
 

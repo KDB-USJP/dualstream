@@ -17,9 +17,12 @@ const DSUI = {
   _driftDisplay: null,
   _expanded: false,
   _sourceInfo: null,
+  _allSources: [],
+  _streamPicker: null,
   _onLinkClick: null,
   _onRelinkClick: null,
   _onOffsetChange: null,
+  _onStreamSelect: null,
   _onToggleExpand: null,
 
   /**
@@ -33,24 +36,35 @@ const DSUI = {
     this._onLinkClick = callbacks.onLinkClick || (() => {});
     this._onRelinkClick = callbacks.onRelinkClick || (() => {});
     this._onOffsetChange = callbacks.onOffsetChange || (() => {});
+    this._onStreamSelect = callbacks.onStreamSelect || (() => {});
 
     this._injectUI();
     DS_UTILS.log('UI initialized');
   },
 
   /**
-   * Show the action button (called when a |||url||| is detected).
-   * @param {{ type: string, url: string }} sourceInfo
+   * Show the action button (called when |||url||| is detected).
+   * @param {{ type: string, url: string, label: string }} sourceInfo
+   * @param {Array} [allSources] - All detected sources (for multi-stream)
    */
-  showButton(sourceInfo) {
+  showButton(sourceInfo, allSources = []) {
     this._sourceInfo = sourceInfo;
+    this._allSources = allSources.length > 0 ? allSources : [sourceInfo];
+
     if (this._button) {
       this._button.style.display = 'flex';
-      const sourceLabel = sourceInfo.type === DS_CONSTANTS.SOURCE_MIXCLOUD
-        ? '🎧 Mixcloud'
-        : '🔊 Audio';
-      this._button.querySelector('.dualstream-btn-label').textContent =
-        `Link Alternate Audio (${sourceLabel})`;
+      const label = this._button.querySelector('.dualstream-btn-label');
+
+      if (this._allSources.length > 1) {
+        // Multi-stream: show count
+        label.textContent = `Link Alternate Audio (${this._allSources.length} available)`;
+      } else {
+        // Single stream: show source type
+        const sourceLabel = sourceInfo.type === DS_CONSTANTS.SOURCE_MIXCLOUD
+          ? '🎧 Mixcloud'
+          : '🔊 Audio';
+        label.textContent = `Link Alternate Audio (${sourceLabel})`;
+      }
     }
   },
 
@@ -333,6 +347,80 @@ const DSUI = {
         }
         this._onOffsetChange(offsetMs);
       });
+    }
+
+    // Click outside to close stream picker
+    document.addEventListener('click', (e) => {
+      if (this._streamPicker && !this._streamPicker.contains(e.target) &&
+          !this._button.contains(e.target)) {
+        this.hideStreamPicker();
+      }
+    });
+  },
+
+  // ─── Stream Picker (Multi-Stream) ─────────────────────────
+
+  /**
+   * Show the stream picker popover.
+   */
+  showStreamPicker() {
+    if (!this._container || this._allSources.length <= 1) return;
+
+    // Remove existing picker
+    this.hideStreamPicker();
+
+    this._streamPicker = document.createElement('div');
+    this._streamPicker.className = 'dualstream-stream-picker';
+
+    let html = '<div class="dualstream-picker-title">Select Audio Stream</div>';
+
+    this._allSources.forEach((source, index) => {
+      const isActive = this._sourceInfo && this._sourceInfo.url === source.url &&
+                       this._button?.classList.contains('dualstream-btn-active');
+      const icon = source.type === DS_CONSTANTS.SOURCE_MIXCLOUD ? '🎧' : '🔊';
+      const activeClass = isActive ? ' dualstream-picker-item-active' : '';
+      const activeDot = isActive ? '<span class="dualstream-picker-active-dot"></span>' : '';
+
+      html += `
+        <button class="dualstream-picker-item${activeClass}" data-stream-index="${index}">
+          <span class="dualstream-picker-icon">${icon}</span>
+          <span class="dualstream-picker-label">${source.label || 'Stream ' + (index + 1)}</span>
+          ${activeDot}
+        </button>
+      `;
+    });
+
+    this._streamPicker.innerHTML = html;
+
+    // Bind stream item clicks
+    this._streamPicker.querySelectorAll('.dualstream-picker-item').forEach((item) => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const idx = parseInt(item.dataset.streamIndex, 10);
+        const source = this._allSources[idx];
+        if (source) {
+          this._onStreamSelect(source);
+        }
+      });
+    });
+
+    // Position below the button
+    this._container.appendChild(this._streamPicker);
+
+    // Animate in
+    requestAnimationFrame(() => {
+      this._streamPicker.classList.add('dualstream-picker-visible');
+    });
+  },
+
+  /**
+   * Hide the stream picker popover.
+   */
+  hideStreamPicker() {
+    if (this._streamPicker) {
+      this._streamPicker.remove();
+      this._streamPicker = null;
     }
   },
 

@@ -8,6 +8,7 @@
 const DualStream = {
   _active: false,
   _currentSource: null,
+  _allSources: [],
   _audioAdapter: null,
   _settings: null,
 
@@ -25,6 +26,7 @@ const DualStream = {
       onLinkClick: () => this._handleLinkToggle(),
       onRelinkClick: () => this._handleRelink(),
       onOffsetChange: (ms) => this._handleOffsetChange(ms),
+      onStreamSelect: (source) => this._handleStreamSelect(source),
     });
 
     // Initialize the parser
@@ -32,10 +34,11 @@ const DualStream = {
 
     // Listen for URL discoveries
     DSParser.onFound((source, allSources) => {
-      DS_UTILS.log('Audio source found:', source);
+      DS_UTILS.log('Audio source(s) found:', allSources.length);
       this._currentSource = source;
+      this._allSources = allSources;
       DSUI.show();
-      DSUI.showButton(source);
+      DSUI.showButton(source, allSources);
     });
 
     // Listen for URL clearances (navigated away)
@@ -67,8 +70,32 @@ const DualStream = {
     if (this._active) {
       await this._stopLink();
     } else {
-      await this._startLink();
+      // If multiple streams, the UI picker handles selection
+      // If single stream, link directly
+      if (this._allSources.length > 1) {
+        DSUI.showStreamPicker();
+      } else {
+        await this._startLink();
+      }
     }
+  },
+
+  /**
+   * Handle stream selection from the picker (multi-stream).
+   * Seamlessly switches: unlinks old stream if active, links new one.
+   */
+  async _handleStreamSelect(source) {
+    DS_UTILS.log('Stream selected:', source.label);
+    DSUI.hideStreamPicker();
+
+    // If currently linked to a different stream, unlink first
+    if (this._active) {
+      await this._stopLink();
+    }
+
+    // Link the selected stream
+    this._currentSource = source;
+    await this._startLink();
   },
 
   /**
@@ -230,6 +257,7 @@ const DualStream = {
     }
     this._active = false;
     this._currentSource = null;
+    this._allSources = [];
   },
 };
 
