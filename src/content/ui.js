@@ -124,10 +124,12 @@ const DSUI = {
       if (state === DS_CONSTANTS.SYNC_SYNCING || state === DS_CONSTANTS.SYNC_PAUSED) {
         label.textContent = 'Unlink Audio';
         this._button.classList.add('dualstream-btn-active');
+        this._button.classList.remove('dualstream-btn-loading'); // ← critical: remove pointer-events:none
         this._showPlayerBar();
       } else if (state === DS_CONSTANTS.SYNC_LOADING || state === DS_CONSTANTS.SYNC_BUFFERING) {
         label.textContent = 'Linking...';
         this._button.classList.add('dualstream-btn-loading');
+        this._button.classList.remove('dualstream-btn-active');
       } else {
         // Reset to idle — restore multi-stream or single-stream label
         if (this._allSources.length > 1) {
