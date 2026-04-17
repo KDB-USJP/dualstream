@@ -1,0 +1,436 @@
+/*
+ * DualStream — Content Script Styles
+ * Injected into YouTube pages when a |||url||| is detected.
+ *
+ * Design: Blends with YouTube's native UI while being
+ * distinctly identifiable as DualStream.
+ */
+
+/* ─── CSS Custom Properties (Design Tokens) ─────────────── */
+:root {
+  --ds-accent: #FF6B35;
+  --ds-accent-hover: #FF8255;
+  --ds-accent-glow: rgba(255, 107, 53, 0.25);
+  --ds-bg-primary: #1a1a2e;
+  --ds-bg-secondary: #16213e;
+  --ds-bg-surface: #0f3460;
+  --ds-text-primary: #e8e8e8;
+  --ds-text-secondary: #a0a0b0;
+  --ds-text-muted: #6b6b80;
+  --ds-border: rgba(255, 255, 255, 0.08);
+  --ds-success: #00c853;
+  --ds-warning: #ffab00;
+  --ds-error: #ff5252;
+  --ds-radius: 10px;
+  --ds-radius-sm: 6px;
+  --ds-transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --ds-font: 'Roboto', 'YouTube Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ─── Main Container ─────────────────────────────────────── */
+#dualstream-container {
+  font-family: var(--ds-font);
+  margin: 8px 0 12px 0;
+  position: relative;
+  z-index: 100;
+}
+
+/* ─── Action Button ──────────────────────────────────────── */
+.dualstream-sync-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--ds-bg-primary);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius);
+  color: var(--ds-text-primary);
+  font-family: var(--ds-font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--ds-transition);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.dualstream-sync-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, var(--ds-accent-glow), transparent 60%);
+  opacity: 0;
+  transition: opacity var(--ds-transition);
+}
+
+.dualstream-sync-btn:hover {
+  border-color: var(--ds-accent);
+  box-shadow: 0 0 20px var(--ds-accent-glow);
+  transform: translateY(-1px);
+}
+
+.dualstream-sync-btn:hover::before {
+  opacity: 1;
+}
+
+.dualstream-sync-btn:active {
+  transform: translateY(0);
+}
+
+/* Active state (linked) */
+.dualstream-sync-btn.dualstream-btn-active {
+  background: linear-gradient(135deg, var(--ds-bg-primary), var(--ds-bg-surface));
+  border-color: var(--ds-accent);
+  box-shadow: 0 0 12px var(--ds-accent-glow);
+}
+
+/* Loading state */
+.dualstream-sync-btn.dualstream-btn-loading {
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.dualstream-sync-btn.dualstream-btn-loading .dualstream-btn-spinner {
+  display: inline-block;
+}
+.dualstream-sync-btn.dualstream-btn-loading .dualstream-btn-icon {
+  display: none;
+}
+
+/* Button icon */
+.dualstream-btn-icon {
+  display: flex;
+  align-items: center;
+  color: var(--ds-accent);
+  z-index: 1;
+}
+
+.dualstream-btn-label {
+  z-index: 1;
+}
+
+/* Spinner */
+.dualstream-btn-spinner {
+  display: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--ds-text-muted);
+  border-top-color: var(--ds-accent);
+  border-radius: 50%;
+  animation: ds-spin 0.8s linear infinite;
+  z-index: 1;
+}
+
+@keyframes ds-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Status Dot ─────────────────────────────────────────── */
+.dualstream-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background var(--ds-transition), box-shadow var(--ds-transition);
+  z-index: 1;
+}
+
+.dualstream-status-idle {
+  background: var(--ds-text-muted);
+}
+
+.dualstream-status-ok {
+  background: var(--ds-success);
+  box-shadow: 0 0 6px rgba(0, 200, 83, 0.5);
+  animation: ds-pulse 2s ease-in-out infinite;
+}
+
+.dualstream-status-warn {
+  background: var(--ds-warning);
+  box-shadow: 0 0 6px rgba(255, 171, 0, 0.5);
+}
+
+.dualstream-status-error {
+  background: var(--ds-error);
+  box-shadow: 0 0 6px rgba(255, 82, 82, 0.5);
+  animation: ds-blink 0.6s ease-in-out infinite;
+}
+
+.dualstream-status-paused {
+  background: var(--ds-accent);
+  opacity: 0.7;
+}
+
+@keyframes ds-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes ds-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ─── Player Bar ─────────────────────────────────────────── */
+.dualstream-player-bar {
+  margin-top: 8px;
+  background: var(--ds-bg-primary);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius);
+  overflow: hidden;
+  animation: ds-slideDown 0.3s ease-out;
+}
+
+@keyframes ds-slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 300px;
+  }
+}
+
+.dualstream-player-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+}
+
+.dualstream-player-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dualstream-player-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ds-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dualstream-drift-label {
+  font-size: 11px;
+  color: var(--ds-text-muted);
+}
+
+.dualstream-drift-value {
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Roboto Mono', 'Consolas', monospace;
+  color: var(--ds-text-secondary);
+  min-width: 50px;
+}
+
+.dualstream-player-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Re-link button */
+.dualstream-resync-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-text-secondary);
+  font-family: var(--ds-font);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all var(--ds-transition);
+}
+
+.dualstream-resync-btn:hover {
+  background: var(--ds-bg-surface);
+  border-color: var(--ds-accent);
+  color: var(--ds-accent);
+}
+
+/* Expand button */
+.dualstream-expand-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all var(--ds-transition);
+}
+
+.dualstream-expand-btn:hover {
+  background: var(--ds-bg-surface);
+  border-color: var(--ds-accent);
+  color: var(--ds-accent);
+}
+
+/* ─── Expanded Controls ──────────────────────────────────── */
+.dualstream-controls-expanded {
+  padding: 10px 14px;
+  border-top: 1px solid var(--ds-border);
+  animation: ds-fadeIn 0.2s ease-out;
+}
+
+@keyframes ds-fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.dualstream-control-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dualstream-offset-label {
+  font-size: 11px;
+  color: var(--ds-text-muted);
+  min-width: 85px;
+  font-family: 'Roboto Mono', 'Consolas', monospace;
+}
+
+/* Custom range slider */
+.dualstream-offset-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: var(--ds-bg-surface);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.dualstream-offset-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--ds-accent);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform var(--ds-transition), box-shadow var(--ds-transition);
+}
+
+.dualstream-offset-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 8px var(--ds-accent-glow);
+}
+
+.dualstream-offset-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--ds-accent);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* ─── Audio Container (Mixcloud/Generic mount) ───────────── */
+.dualstream-audio-container {
+  padding: 8px 14px;
+  border-top: 1px solid var(--ds-border);
+  max-height: 80px;
+  overflow: hidden;
+  transition: max-height var(--ds-transition);
+}
+
+.dualstream-audio-container.dualstream-audio-visible {
+  max-height: 200px;
+}
+
+.dualstream-audio-mount {
+  display: none;
+  border-top: 1px solid var(--ds-border);
+  padding: 8px 14px;
+}
+
+/* ─── Toast Notification ─────────────────────────────────── */
+.dualstream-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #1a1a2e, #0f3460);
+  border-bottom: 1px solid var(--ds-border);
+  border-left: 3px solid var(--ds-accent);
+  color: var(--ds-text-primary);
+  font-family: var(--ds-font);
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.dualstream-toast-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dualstream-toast-hiding {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.dualstream-toast-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  animation: ds-bounce 1.5s ease-in-out infinite;
+}
+
+.dualstream-toast-text {
+  flex: 1;
+  line-height: 1.4;
+}
+
+@keyframes ds-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Light mode toast override */
+html:not([dark]) .dualstream-toast {
+  background: linear-gradient(135deg, #f0f0f8, #e0e0f0);
+  color: var(--ds-text-primary);
+}
+
+/* ─── YouTube Light Mode Overrides ───────────────────────── */
+html[dark] #dualstream-container,
+ytd-app[darker-dark-theme] #dualstream-container {
+  /* Dark mode — use defaults above */
+}
+
+html:not([dark]) #dualstream-container {
+  --ds-bg-primary: #f5f5f8;
+  --ds-bg-secondary: #e8e8f0;
+  --ds-bg-surface: #dddde8;
+  --ds-text-primary: #1a1a2e;
+  --ds-text-secondary: #4a4a60;
+  --ds-text-muted: #8080a0;
+  --ds-border: rgba(0, 0, 0, 0.1);
+}
+
+html:not([dark]) .dualstream-sync-btn {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+html:not([dark]) .dualstream-player-bar {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}

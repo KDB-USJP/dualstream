@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DualStream</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="ds-popup">
+    <!-- Header -->
+    <header class="ds-header">
+      <div class="ds-logo">
+        <img src="../../icons/icon48.png" alt="DualStream" width="24" height="24">
+        <h1>DualStream</h1>
+      </div>
+      <span class="ds-version">v1.0.0</span>
+    </header>
+
+    <!-- Status Section -->
+    <section class="ds-section ds-status-section">
+      <div class="ds-status-row">
+        <span class="ds-status-dot" id="popup-status-dot"></span>
+        <span class="ds-status-label" id="popup-status-label">Idle</span>
+      </div>
+      <div class="ds-status-detail" id="popup-source" style="display:none;">
+        <span class="ds-label">Source:</span>
+        <span class="ds-value" id="popup-source-value">—</span>
+      </div>
+      <div class="ds-status-detail" id="popup-drift-row" style="display:none;">
+        <span class="ds-label">Drift:</span>
+        <span class="ds-value ds-mono" id="popup-drift-value">0ms</span>
+      </div>
+    </section>
+
+    <!-- Quick Controls -->
+    <section class="ds-section ds-controls-section" id="popup-controls" style="display:none;">
+      <button class="ds-btn ds-btn-primary" id="popup-toggle-btn">Link Audio</button>
+      <button class="ds-btn ds-btn-secondary" id="popup-relink-btn">⟳ Re-link</button>
+    </section>
+
+    <!-- Settings -->
+    <section class="ds-section ds-settings-section">
+      <h2 class="ds-section-title">Settings</h2>
+
+      <div class="ds-setting">
+        <label class="ds-setting-label" for="setting-yt-volume">
+          YT Volume
+          <span class="ds-setting-hint">Low volume avoids API pausing</span>
+        </label>
+        <div class="ds-setting-control">
+          <input type="range" id="setting-yt-volume" min="0" max="20" value="1" step="1">
+          <span class="ds-setting-value" id="setting-yt-volume-value">1%</span>
+        </div>
+      </div>
+
+      <div class="ds-setting">
+        <label class="ds-setting-label" for="setting-offset">
+          Manual Offset
+          <span class="ds-setting-hint">Fine-tune audio timing (ms)</span>
+        </label>
+        <div class="ds-setting-control">
+          <input type="range" id="setting-offset" min="-500" max="500" value="0" step="10">
+          <span class="ds-setting-value ds-mono" id="setting-offset-value">0ms</span>
+        </div>
+      </div>
+
+      <div class="ds-setting ds-setting-toggle">
+        <label class="ds-setting-label" for="setting-show-controls">
+          Show on-page controls
+        </label>
+        <label class="ds-switch">
+          <input type="checkbox" id="setting-show-controls" checked>
+          <span class="ds-switch-slider"></span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="ds-footer">
+      <a href="https://github.com/dualstream/dualstream" target="_blank" rel="noopener">GitHub</a>
+      <span class="ds-separator">·</span>
+      <span>MIT License</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>DualStream — Mixcloud Bridge</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      overflow: hidden;
+    }
+    iframe {
+      border: none;
+      width: 100%;
+      height: 60px;
+    }
+  </style>
+</head>
+<body>
+  <!--
+    This page acts as a bridge between the DualStream content script
+    and the Mixcloud widget. It's loaded as a web_accessible_resource
+    inside a Chrome extension iframe on the YouTube page.
+    
+    Not currently used in v1 (the iframe is injected directly), but
+    reserved for future use if content security policies require it.
+  -->
+  <div id="player-mount"></div>
+  <script src="https://widget.mixcloud.com/media/js/widgetApi.js"></script>
+  <script>
+    // Listen for messages from the parent content script
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.source === 'dualstream') {
+        handleCommand(event.data);
+      }
+    });
+
+    let widget = null;
+
+    function handleCommand(data) {
+      switch (data.command) {
+        case 'init':
+          initPlayer(data.embedUrl);
+          break;
+        case 'play':
+          if (widget) widget.play();
+          break;
+        case 'pause':
+          if (widget) widget.pause();
+          break;
+        case 'seek':
+          if (widget) widget.seek(data.seconds);
+          break;
+        case 'getPosition':
+          if (widget) {
+            widget.getPosition().then((pos) => {
+              window.parent.postMessage({
+                source: 'dualstream-bridge',
+                type: 'position',
+                position: pos,
+                requestId: data.requestId,
+              }, '*');
+            });
+          }
+          break;
+      }
+    }
+
+    function initPlayer(embedUrl) {
+      const mount = document.getElementById('player-mount');
+      const iframe = document.createElement('iframe');
+      iframe.id = 'mc-widget';
+      iframe.src = embedUrl;
+      iframe.width = '100%';
+      iframe.height = '60';
+      iframe.allow = 'autoplay';
+      mount.appendChild(iframe);
+
+      widget = Mixcloud.PlayerWidget(iframe);
+      widget.ready.then(() => {
+        window.parent.postMessage({
+          source: 'dualstream-bridge',
+          type: 'ready',
+        }, '*');
+
+        // Forward progress events
+        widget.events.progress.on((position, duration) => {
+          window.parent.postMessage({
+            source: 'dualstream-bridge',
+            type: 'progress',
+            position,
+            duration,
+          }, '*');
+        });
+
+        widget.events.play.on(() => {
+          window.parent.postMessage({
+            source: 'dualstream-bridge',
+            type: 'state',
+            state: 'play',
+          }, '*');
+        });
+
+        widget.events.pause.on(() => {
+          window.parent.postMessage({
+            source: 'dualstream-bridge',
+            type: 'state',
+            state: 'pause',
+          }, '*');
+        });
+      });
+    }
+  </script>
+</body>
+</html>

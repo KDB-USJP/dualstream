@@ -1,0 +1,62 @@
+{
+  "manifest_version": 3,
+  "name": "DualStream",
+  "version": "1.0.0",
+  "description": "Link YouTube video with alternate audio streams (Mixcloud, direct audio, and more).",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://widget.mixcloud.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/watch*"
+      ],
+      "js": [
+        "src/lib/mixcloudWidget.js",
+        "src/shared/constants.js",
+        "src/shared/utils.js",
+        "src/content/parser.js",
+        "src/content/players/mixcloud.js",
+        "src/content/players/generic.js",
+        "src/content/sync.js",
+        "src/content/ui.js",
+        "src/content/content.js"
+      ],
+      "css": [
+        "src/content/content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "src/background/service-worker.js"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/content/players/mixcloud-frame.html"
+      ],
+      "matches": [
+        "https://www.youtube.com/*"
+      ]
+    }
+  ]
+}
