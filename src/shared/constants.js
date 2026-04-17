@@ -10,6 +10,7 @@ const DS_CONSTANTS = {
 
   // --- Source Types ---
   SOURCE_MIXCLOUD: 'mixcloud',
+  SOURCE_YOUTUBE: 'youtube',
   SOURCE_GENERIC: 'generic',
 
   // --- Sync States ---
@@ -46,10 +47,49 @@ const DS_CONSTANTS = {
     autoSync: false,
   },
 
-  // --- Mixcloud ---
+  // --- Mixcloud (YT-side embed widget) ---
   MIXCLOUD_DOMAIN: 'mixcloud.com',
   MIXCLOUD_WIDGET_URL: 'https://widget.mixcloud.com/media/js/widgetApi.js',
   MIXCLOUD_EMBED_BASE: 'https://www.mixcloud.com/widget/iframe/',
+
+  // --- YouTube ---
+  YOUTUBE_DOMAINS: ['youtube.com', 'youtu.be', 'www.youtube.com'],
+  YOUTUBE_EMBED_BASE: 'https://www.youtube.com/embed/',
+  YOUTUBE_EMBED_PARAMS: 'enablejsapi=1&mute=1&controls=1&modestbranding=1&rel=0&origin=',
+
+  // --- Mixcloud Page Player Selectors (for reading native MC player state) ---
+  // Multiple selectors per element for resilience against MC DOM changes
+  MC_PLAYER_BAR_SELECTORS: [
+    '[class*="PlayerControls"]',
+    '[class*="player-bar"]',
+    '.player-controls',
+  ],
+  MC_TIME_DISPLAY_SELECTORS: [
+    '[class*="PlayerSliderComponent"] [class*="TimestampComponent"]',
+    '[class*="timestamp"]',
+    '[class*="TimeDisplay"]',
+  ],
+  MC_PLAY_BUTTON_SELECTORS: [
+    '[class*="PlayerQueuePlayButton"]',
+    '[class*="PlayButton"]',
+    'button[aria-label="Play"]',
+    'button[aria-label="Pause"]',
+  ],
+  MC_DESCRIPTION_SELECTORS: [
+    '[class*="ShowDescription"]',
+    '[class*="description"]',
+    '.cloudcast-description',
+  ],
+  MC_ACTION_BAR_SELECTORS: [
+    '[class*="CloudcastActions"]',
+    '[class*="ActionButtons"]',
+    '.action-buttons',
+  ],
+
+  // --- Mixcloud Page UI IDs ---
+  MC_CONTAINER_ID: 'dualstream-mc-container',
+  MC_BUTTON_ID: 'dualstream-mc-btn',
+  MC_PIP_ID: 'dualstream-mc-pip',
 
   // --- Messages ---
   MSG_SYNC_STATUS: 'sync-status',

@@ -1,15 +1,16 @@
 {
   "manifest_version": 3,
   "name": "DualStream",
-  "version": "1.0.0",
-  "description": "Link YouTube video with alternate audio streams (Mixcloud, direct audio, and more).",
+  "version": "1.1.0",
+  "description": "Link YouTube video with alternate audio streams on YouTube, or link video overlays to Mixcloud audio.",
   "permissions": [
     "storage",
     "activeTab"
   ],
   "host_permissions": [
     "https://www.youtube.com/*",
-    "https://widget.mixcloud.com/*"
+    "https://widget.mixcloud.com/*",
+    "https://www.mixcloud.com/*"
   ],
   "content_scripts": [
     {
@@ -29,6 +30,27 @@
       ],
       "css": [
         "src/content/content.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.mixcloud.com/*"
+      ],
+      "js": [
+        "src/lib/youtubeEmbed.js",
+        "src/shared/constants.js",
+        "src/shared/utils.js",
+        "src/mixcloud/mc-parser.js",
+        "src/mixcloud/mc-player-observer.js",
+        "src/mixcloud/mc-youtube-embed.js",
+        "src/mixcloud/mc-sync.js",
+        "src/mixcloud/mc-pip.js",
+        "src/mixcloud/mc-ui.js",
+        "src/mixcloud/mc-content.js"
+      ],
+      "css": [
+        "src/mixcloud/mc-content.css"
       ],
       "run_at": "document_idle"
     }

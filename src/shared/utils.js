@@ -14,6 +14,9 @@ const DS_UTILS = {
       if (parsed.hostname.includes(DS_CONSTANTS.MIXCLOUD_DOMAIN)) {
         return { type: DS_CONSTANTS.SOURCE_MIXCLOUD, url };
       }
+      if (DS_CONSTANTS.YOUTUBE_DOMAINS.some((d) => parsed.hostname.includes(d))) {
+        return { type: DS_CONSTANTS.SOURCE_YOUTUBE, url };
+      }
       return { type: DS_CONSTANTS.SOURCE_GENERIC, url };
     } catch {
       return { type: DS_CONSTANTS.SOURCE_GENERIC, url };
@@ -49,6 +52,48 @@ const DS_UTILS = {
       hide_artwork: '0',
     });
     return `${DS_CONSTANTS.MIXCLOUD_EMBED_BASE}?${params.toString()}`;
+  },
+
+  /**
+   * Extract a YouTube video ID from various URL formats.
+   * Handles: youtube.com/watch?v=ID, youtu.be/ID, youtube.com/embed/ID, etc.
+   * @param {string} url
+   * @returns {string|null}
+   */
+  extractYouTubeVideoId(url) {
+    try {
+      const parsed = new URL(url);
+
+      // youtu.be/VIDEO_ID
+      if (parsed.hostname === 'youtu.be') {
+        return parsed.pathname.slice(1) || null;
+      }
+
+      // youtube.com/watch?v=VIDEO_ID
+      if (parsed.searchParams.has('v')) {
+        return parsed.searchParams.get('v');
+      }
+
+      // youtube.com/embed/VIDEO_ID or youtube.com/v/VIDEO_ID
+      const embedMatch = parsed.pathname.match(/\/(embed|v)\/([^/?]+)/);
+      if (embedMatch) {
+        return embedMatch[2];
+      }
+
+      return null;
+    } catch {
+      return null;
+    }
+  },
+
+  /**
+   * Build a YouTube embed iframe URL from a video ID.
+   * @param {string} videoId
+   * @returns {string}
+   */
+  buildYouTubeEmbedUrl(videoId) {
+    const origin = encodeURIComponent(window.location.origin);
+    return `${DS_CONSTANTS.YOUTUBE_EMBED_BASE}${videoId}?${DS_CONSTANTS.YOUTUBE_EMBED_PARAMS}${origin}`;
   },
 
   /**

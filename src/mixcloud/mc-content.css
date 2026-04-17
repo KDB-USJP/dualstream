@@ -1,0 +1,287 @@
+/*
+ * DualStream — Mixcloud Page Styles
+ * Injected on Mixcloud pages when the extension detects a |||youtube-url|||| in the description.
+ * Uses the same design token system (--ds-*) as the YouTube side.
+ */
+
+/* ─── Design Tokens ──────────────────────────────────────── */
+:root {
+  --ds-accent: #FF6B35;
+  --ds-accent-hover: #FF8255;
+  --ds-accent-glow: rgba(255, 107, 53, 0.25);
+  --ds-bg-primary: #1a1a2e;
+  --ds-bg-secondary: #16213e;
+  --ds-bg-surface: #0f3460;
+  --ds-text-primary: #e8e8e8;
+  --ds-text-secondary: #a0a0b0;
+  --ds-text-muted: #6b6b80;
+  --ds-border: rgba(255, 255, 255, 0.08);
+  --ds-success: #00c853;
+  --ds-warning: #ffab00;
+  --ds-error: #ff5252;
+  --ds-radius: 10px;
+  --ds-radius-sm: 6px;
+  --ds-transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --ds-font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ─── Container ──────────────────────────────────────────── */
+#dualstream-mc-container {
+  font-family: var(--ds-font);
+  margin: 12px 0;
+  position: relative;
+  z-index: 100;
+}
+
+/* ─── Open Video Button ──────────────────────────────────── */
+.dualstream-mc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--ds-bg-primary), var(--ds-bg-surface));
+  border: 1px solid var(--ds-accent);
+  border-radius: var(--ds-radius);
+  color: var(--ds-text-primary);
+  font-family: var(--ds-font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--ds-transition);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  box-shadow: 0 0 12px var(--ds-accent-glow);
+}
+
+.dualstream-mc-btn:hover {
+  background: linear-gradient(135deg, var(--ds-bg-surface), var(--ds-bg-primary));
+  box-shadow: 0 0 24px var(--ds-accent-glow);
+  transform: translateY(-1px);
+}
+
+.dualstream-mc-btn:active {
+  transform: translateY(0);
+}
+
+.dualstream-mc-btn-active {
+  background: linear-gradient(135deg, #2a1a1e, #1a0a2e);
+  border-color: var(--ds-error);
+  box-shadow: 0 0 12px rgba(255, 82, 82, 0.2);
+}
+
+.dualstream-mc-btn-icon {
+  display: flex;
+  align-items: center;
+  color: var(--ds-accent);
+}
+
+.dualstream-mc-btn-label {
+  white-space: nowrap;
+}
+
+/* ─── PiP Overlay ────────────────────────────────────────── */
+.dualstream-pip {
+  position: fixed;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  background: var(--ds-bg-primary);
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  border-radius: var(--ds-radius);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 0 20px var(--ds-accent-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  transition: box-shadow var(--ds-transition);
+  animation: dsPipAppear 0.3s ease-out;
+}
+
+@keyframes dsPipAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.dualstream-pip:hover {
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.6),
+    0 0 30px var(--ds-accent-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.dualstream-pip-dragging {
+  opacity: 0.9;
+  cursor: grabbing !important;
+}
+
+.dualstream-pip-resizing {
+  transition: none !important;
+}
+
+/* PiP Header */
+.dualstream-pip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent);
+  cursor: grab;
+  user-select: none;
+  min-height: 32px;
+}
+
+.dualstream-pip-dragging .dualstream-pip-header {
+  cursor: grabbing;
+}
+
+.dualstream-pip-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dualstream-pip-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ds-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.dualstream-pip-drift {
+  font-size: 10px;
+  font-family: 'Roboto Mono', 'Consolas', monospace;
+  color: var(--ds-text-muted);
+  transition: color var(--ds-transition);
+}
+
+/* PiP Controls */
+.dualstream-pip-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.dualstream-pip-controls button {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--ds-transition);
+}
+
+.dualstream-pip-controls button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ds-text-primary);
+}
+
+.dualstream-pip-close:hover {
+  background: rgba(255, 82, 82, 0.2) !important;
+  color: var(--ds-error) !important;
+}
+
+/* PiP Video Container */
+.dualstream-pip-video {
+  width: 100%;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+}
+
+.dualstream-pip-video iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* PiP Resize Handle */
+.dualstream-pip-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  z-index: 10;
+}
+
+.dualstream-pip-resize-handle::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--ds-text-muted);
+  border-bottom: 2px solid var(--ds-text-muted);
+  opacity: 0.4;
+  transition: opacity var(--ds-transition);
+}
+
+.dualstream-pip:hover .dualstream-pip-resize-handle::after {
+  opacity: 0.8;
+}
+
+/* PiP Minimized */
+.dualstream-pip-minimized .dualstream-pip-video,
+.dualstream-pip-minimized .dualstream-pip-resize-handle {
+  display: none;
+}
+
+.dualstream-pip-minimized {
+  width: auto !important;
+  min-width: 180px;
+}
+
+/* ─── Toast ──────────────────────────────────────────────── */
+.dualstream-mc-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--ds-bg-primary), var(--ds-bg-surface));
+  border: 1px solid var(--ds-accent);
+  border-radius: var(--ds-radius);
+  color: var(--ds-text-primary);
+  font-family: var(--ds-font);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px var(--ds-accent-glow);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 9999999;
+  pointer-events: none;
+}
+
+.dualstream-mc-toast-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.dualstream-mc-toast-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.dualstream-mc-toast-text {
+  flex: 1;
+  line-height: 1.4;
+}
