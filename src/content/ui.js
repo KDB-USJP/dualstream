@@ -129,10 +129,15 @@ const DSUI = {
         label.textContent = 'Linking...';
         this._button.classList.add('dualstream-btn-loading');
       } else {
-        const sourceLabel = this._sourceInfo?.type === DS_CONSTANTS.SOURCE_MIXCLOUD
-          ? '🎧 Mixcloud'
-          : '🔊 Audio';
-        label.textContent = `Link Alternate Audio (${sourceLabel})`;
+        // Reset to idle — restore multi-stream or single-stream label
+        if (this._allSources.length > 1) {
+          label.textContent = `Link Alternate Audio (${this._allSources.length} available)`;
+        } else {
+          const sourceLabel = this._sourceInfo?.type === DS_CONSTANTS.SOURCE_MIXCLOUD
+            ? '🎧 Mixcloud'
+            : '🔊 Audio';
+          label.textContent = `Link Alternate Audio (${sourceLabel})`;
+        }
         this._button.classList.remove('dualstream-btn-active', 'dualstream-btn-loading');
         this._hidePlayerBar();
       }

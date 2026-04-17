@@ -167,11 +167,27 @@ const DualStream = {
    */
   async _stopLink() {
     DS_UTILS.log('Unlinking audio — destroying conductor and adapter');
-    DSSyncConductor.destroy();
-    if (this._audioAdapter) {
-      this._audioAdapter.destroy();
+
+    // Dismiss stream picker if open
+    DSUI.hideStreamPicker();
+
+    try {
+      DSSyncConductor.destroy();
+    } catch (e) {
+      DS_UTILS.warn('Error destroying sync conductor:', e);
+    }
+
+    try {
+      if (this._audioAdapter) {
+        this._audioAdapter.destroy();
+        this._audioAdapter = null;
+      }
+    } catch (e) {
+      DS_UTILS.warn('Error destroying audio adapter:', e);
       this._audioAdapter = null;
     }
+
+    // Always reset state, even if cleanup threw
     this._active = false;
     DSUI.setState(DS_CONSTANTS.SYNC_IDLE);
     DS_UTILS.log('Audio unlinked');
