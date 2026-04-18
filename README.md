@@ -1,19 +1,20 @@
 # DualStream
+<img width="1518" height="458" alt="dual_stream_wide" src="https://github.com/user-attachments/assets/43c6f63b-af24-4df6-8e29-85671a36feb8" />
 
-**Bidirectional linked playback between YouTube and Mixcloud.**
+**Bidirectional linked playback between YouTube and Mixcloud or other audio sources.**
 
-DualStream is an open-source Chrome extension that links video and audio across platforms — keeping them tightly synchronized in time. Watch a YouTube video with alternate audio from Mixcloud, or watch a linked YouTube video while listening on Mixcloud.
+DualStream is an open-source Chrome extension that links video and audio across platforms — keeping them tightly synchronized in time. Watch a YouTube video with alternate audio from Mixcloud or your own hosting, or watch a linked YouTube video while listening on Mixcloud for legal streaming of DJ sets via a MixCloud Pro subscription. DualStream helps you stay legal and helps artists get paid ongoing audio streaming revenue that they need to survive without licensing as "synchronized" streams, since the video and audio are separate entities governed by their own arrangements and are never combined.
 
 ## Why?
 
-Video and audio exist as **separate, independently-licensed streams**. DualStream keeps them that way. You watch video from one source while listening to audio from another, with both streams playing in time.
+Video and audio exist as **separate, independently-licensed streams**. DualStream keeps them that way. You watch video from one source while listening to audio from another, with both streams playing in time, but still 100% separate from one another.
 
 Common use cases:
-- 🎧 **Performance videos** — Watch a DJ set on YouTube while the properly-licensed audio plays from Mixcloud
-- 🎙️ **Commentary tracks** — Add a director's commentary or alternate narration to any video
-- 🌐 **Language dubs** — Listen in your language while watching the original video
-- 🎵 **High-fidelity audio** — Bypass YouTube's compressed audio with a higher-quality source
-- 🎥 **Video overlays** — Mixcloud creators can link a YouTube video that plays alongside their audio
+- 🎧 **Performance videos** — Watch the visual portion of a DJ set on YouTube while the properly-licensed audio plays from Mixcloud. On Mixcloud, artists are paid via a custom technology that Mixcloud created to ensure your favorite artists receive streaming revenue.
+- 🎙️ **Commentary tracks** — Add a director's commentary or alternate narration to any video on Youtube.
+- 🌐 **Language dubs** — Listen in your language while watching the original video, or set up a personal collection of Rifftrax-style alternative audio sources.
+- 🎵 **High-fidelity audio** — Use alternatives to YouTube's compressed audio with a higher-quality source
+- 🎥 **Video overlays** — Mixcloud creators can link a YouTube video that plays alongside their audio, but remains unserved by Mixcloud, either to bridge visual and audio performance or simply to provide 
 
 ## Installation
 
