@@ -1,5 +1,6 @@
 # DualStream
-<img width="1518" height="458" alt="dual_stream_wide" src="https://github.com/user-attachments/assets/43c6f63b-af24-4df6-8e29-85671a36feb8" />
+<img width="1000" alt="dual_stream_wide" src="https://github.com/user-attachments/assets/43c6f63b-af24-4df6-8e29-85671a36feb8" />
+
 
 **Bidirectional linked playback between YouTube and Mixcloud or other audio sources.**
 
