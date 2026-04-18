@@ -1,6 +1,6 @@
 /*
  * DualStream — Popup Styles
- * Premium dark aesthetic with warm orange accents.
+ * Premium dark aesthetic with pink-to-blue gradient accents.
  */
 
 * {
@@ -49,7 +49,7 @@ body {
 .ds-logo h1 {
   font-size: 16px;
   font-weight: 700;
-  background: linear-gradient(135deg, #FF6B35, #FF8255);
+  background: linear-gradient(135deg, #ff00ff, #3fa9f5);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -154,15 +154,15 @@ body {
 }
 
 .ds-btn-primary {
-  background: linear-gradient(135deg, #FF6B35, #e05a2a);
+  background: linear-gradient(135deg, #ff00ff, #3fa9f5);
   color: white;
   border: none;
 }
 
 .ds-btn-primary:hover {
-  background: linear-gradient(135deg, #FF8255, #FF6B35);
+  background: linear-gradient(135deg, #dd66ff, #5cb8ff);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  box-shadow: 0 4px 12px rgba(180, 60, 255, 0.3);
 }
 
 .ds-btn-secondary {
@@ -173,8 +173,8 @@ body {
 
 .ds-btn-secondary:hover {
   background: rgba(255, 255, 255, 0.05);
-  border-color: #FF6B35;
-  color: #FF6B35;
+  border-color: #cc44ff;
+  color: #cc44ff;
 }
 
 /* ─── Settings ───────────────────────────────────────────── */
@@ -210,7 +210,7 @@ body {
 
 .ds-setting-value {
   font-size: 12px;
-  color: #FF6B35;
+  color: #cc44ff;
   min-width: 40px;
   text-align: right;
 }
@@ -231,7 +231,7 @@ input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 14px;
   height: 14px;
-  background: #FF6B35;
+  background: #cc44ff;
   border-radius: 50%;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -239,13 +239,13 @@ input[type="range"]::-webkit-slider-thumb {
 
 input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.2);
-  box-shadow: 0 0 8px rgba(255, 107, 53, 0.4);
+  box-shadow: 0 0 8px rgba(180, 60, 255, 0.4);
 }
 
 input[type="range"]::-moz-range-thumb {
   width: 14px;
   height: 14px;
-  background: #FF6B35;
+  background: #cc44ff;
   border: none;
   border-radius: 50%;
   cursor: pointer;
@@ -296,7 +296,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .ds-switch input:checked + .ds-switch-slider {
-  background: #FF6B35;
+  background: #cc44ff;
 }
 
 .ds-switch input:checked + .ds-switch-slider::before {
@@ -322,7 +322,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .ds-footer a:hover {
-  color: #FF6B35;
+  color: #cc44ff;
 }
 
 .ds-separator {

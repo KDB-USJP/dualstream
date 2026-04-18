@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 48.01 48.01">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        fill: url(#New_Gradient_Swatch_1);
+      }
+    </style>
+    <linearGradient id="New_Gradient_Swatch_1" data-name="New Gradient Swatch 1" x1="18.18" y1="11.34" x2="29.81" y2="36.62" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f0f"/>
+      <stop offset=".07" stop-color="#f504fc"/>
+      <stop offset=".2" stop-color="#dc10f6"/>
+      <stop offset=".35" stop-color="#b223eb"/>
+      <stop offset=".54" stop-color="#783ddc"/>
+      <stop offset=".74" stop-color="#305eca"/>
+      <stop offset=".87" stop-color="#0075be"/>
+      <stop offset=".99" stop-color="#005b97"/>
+    </linearGradient>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g>
+      <g>
+        <circle cx="24.01" cy="24.01" r="24"/>
+        <circle class="cls-1" cx="24.01" cy="24.01" r="14.67"/>
+        <path class="cls-2" d="M36.87,18.13s-.01-.02-.02-.04c-3.26-7.1-11.67-10.21-18.76-6.94-7.09,3.26-10.2,11.64-6.95,18.74,0,0,0,.02.01.03,3.26,7.1,11.67,10.21,18.76,6.94,7.09-3.26,10.19-11.64,6.96-18.73Z"/>
+        <circle cx="24.01" cy="24.01" r="1.12"/>
+      </g>
+      <polygon class="cls-1" points="18.08 15.3 20.21 16.3 22.42 23.11 22.02 24.92 14.84 28.2 12.78 21.84 15.45 20.59 16.59 24.13 19.26 22.88 17.89 18.64 12.55 21.13 10.66 18.86 18.08 15.3"/>
+      <polygon class="cls-1" points="33.7 22.76 28.35 25.25 28.58 25.96 33.93 23.47 35.99 29.83 26.27 34.35 27.05 30.74 32.4 28.25 32.17 27.54 26.82 30.03 25.35 25.49 25.87 23.16 32.79 19.99 33.7 22.76"/>
+    </g>
+  </g>
+</svg>

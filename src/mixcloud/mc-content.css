@@ -4,11 +4,13 @@
  * Uses the same design token system (--ds-*) as the YouTube side.
  */
 
-/* ─── Design Tokens ──────────────────────────────────────── */
+/* ─── Design Tokens ──────────────────────────────────── */
 :root {
-  --ds-accent: #FF6B35;
-  --ds-accent-hover: #FF8255;
-  --ds-accent-glow: rgba(255, 107, 53, 0.25);
+  --ds-accent: #cc44ff;
+  --ds-accent-hover: #dd66ff;
+  --ds-accent-glow: rgba(180, 60, 255, 0.25);
+  --ds-gradient: linear-gradient(135deg, #ff00ff, #3fa9f5);
+  --ds-gradient-glow: linear-gradient(135deg, rgba(255,0,255,0.3), rgba(63,169,245,0.3));
   --ds-bg-primary: #1a1a2e;
   --ds-bg-secondary: #16213e;
   --ds-bg-surface: #0f3460;
@@ -87,7 +89,7 @@
   display: flex;
   flex-direction: column;
   background: var(--ds-bg-primary);
-  border: 1px solid rgba(255, 107, 53, 0.3);
+  border: 1px solid rgba(180, 60, 255, 0.3);
   border-radius: var(--ds-radius);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.5),
@@ -284,4 +286,27 @@
 .dualstream-mc-toast-text {
   flex: 1;
   line-height: 1.4;
+}
+
+/* ─── Spinning Vinyl Icon ────────────────────────────────── */
+.dualstream-vinyl {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  animation: ds-vinyl-spin 2s linear infinite;
+  flex-shrink: 0;
+  image-rendering: auto;
+}
+
+.dualstream-vinyl-paused {
+  animation-play-state: paused;
+}
+
+.dualstream-vinyl-hidden {
+  display: none;
+}
+
+@keyframes ds-vinyl-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

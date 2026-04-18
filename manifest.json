@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "DualStream",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Link YouTube video with alternate audio streams on YouTube, or link video overlays to Mixcloud audio.",
   "permissions": [
     "storage",
@@ -74,10 +74,13 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "src/content/players/mixcloud-frame.html"
+        "src/content/players/mixcloud-frame.html",
+        "icons/icon48.png",
+        "icons/icon128.png"
       ],
       "matches": [
-        "https://www.youtube.com/*"
+        "https://www.youtube.com/*",
+        "https://www.mixcloud.com/*"
       ]
     }
   ]

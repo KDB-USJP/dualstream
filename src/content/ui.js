@@ -118,20 +118,37 @@ const DSUI = {
         this._statusDot.title = 'Idle';
     }
 
-    // Update button text based on state
+    // Update button text and vinyl spin state
     if (this._button) {
       const label = this._button.querySelector('.dualstream-btn-label');
-      if (state === DS_CONSTANTS.SYNC_SYNCING || state === DS_CONSTANTS.SYNC_PAUSED) {
+      const vinyl = this._button.querySelector('.dualstream-vinyl');
+
+      if (state === DS_CONSTANTS.SYNC_SYNCING) {
         label.textContent = 'Unlink Audio';
         this._button.classList.add('dualstream-btn-active');
-        this._button.classList.remove('dualstream-btn-loading'); // ← critical: remove pointer-events:none
+        this._button.classList.remove('dualstream-btn-loading');
+        if (vinyl) {
+          vinyl.classList.remove('dualstream-vinyl-hidden', 'dualstream-vinyl-paused');
+        }
+        this._showPlayerBar();
+      } else if (state === DS_CONSTANTS.SYNC_PAUSED) {
+        label.textContent = 'Unlink Audio';
+        this._button.classList.add('dualstream-btn-active');
+        this._button.classList.remove('dualstream-btn-loading');
+        if (vinyl) {
+          vinyl.classList.remove('dualstream-vinyl-hidden');
+          vinyl.classList.add('dualstream-vinyl-paused');
+        }
         this._showPlayerBar();
       } else if (state === DS_CONSTANTS.SYNC_LOADING || state === DS_CONSTANTS.SYNC_BUFFERING) {
         label.textContent = 'Linking...';
         this._button.classList.add('dualstream-btn-loading');
         this._button.classList.remove('dualstream-btn-active');
+        if (vinyl) {
+          vinyl.classList.remove('dualstream-vinyl-hidden', 'dualstream-vinyl-paused');
+        }
       } else {
-        // Reset to idle — restore multi-stream or single-stream label
+        // Reset to idle
         if (this._allSources.length > 1) {
           label.textContent = `Link Alternate Audio (${this._allSources.length} available)`;
         } else {
@@ -141,6 +158,9 @@ const DSUI = {
           label.textContent = `Link Alternate Audio (${sourceLabel})`;
         }
         this._button.classList.remove('dualstream-btn-active', 'dualstream-btn-loading');
+        if (vinyl) {
+          vinyl.classList.add('dualstream-vinyl-paused');
+        }
         this._hidePlayerBar();
       }
     }
@@ -271,11 +291,7 @@ const DSUI = {
       <button id="${DS_CONSTANTS.BUTTON_ID}" class="dualstream-sync-btn" style="display:none;">
         <span id="${DS_CONSTANTS.STATUS_DOT_ID}" class="dualstream-status-dot dualstream-status-idle"></span>
         <span class="dualstream-btn-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 18V5l12-2v13"/>
-            <circle cx="6" cy="18" r="3"/>
-            <circle cx="18" cy="16" r="3"/>
-          </svg>
+          <img src="${chrome.runtime.getURL('icons/icon48.png')}" class="dualstream-vinyl dualstream-vinyl-paused" alt="DS" />
         </span>
         <span class="dualstream-btn-label">Link Alternate Audio</span>
         <span class="dualstream-btn-spinner"></span>

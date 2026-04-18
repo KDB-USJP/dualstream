@@ -71,6 +71,7 @@ const MCPiP = {
     return `
       <div class="dualstream-pip-header">
         <div class="dualstream-pip-info">
+          <img src="${chrome.runtime.getURL('icons/icon48.png')}" class="dualstream-vinyl" alt="DS" />
           <span class="dualstream-pip-title">DualStream</span>
           <span class="dualstream-pip-drift">—</span>
         </div>
