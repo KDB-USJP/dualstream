@@ -1,6 +1,7 @@
 # DualStream
 <img width="1000" alt="dual_stream_wide" src="https://github.com/user-attachments/assets/43c6f63b-af24-4df6-8e29-85671a36feb8" />
 
+[![Support on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20DualStream-72a4f2?logo=kofi&logoColor=white)](https://ko-fi.com/E1E2QLV2H)
 
 **Bidirectional linked playback between YouTube and Mixcloud or other audio sources.**
 
