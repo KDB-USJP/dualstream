@@ -12,7 +12,9 @@ const DSSyncConductor = {
   _video: null,
   _audioAdapter: null,
   _running: false,
+  _timerId: null,
   _rafId: null,
+  _originalVolume: 1.0,
   _lastCheckTime: 0,
   _userOffset: 0,         // User-defined offset in seconds
   _currentDrift: 0,       // Last measured drift in ms
@@ -35,9 +37,7 @@ const DSSyncConductor = {
     this._audioAdapter = audioAdapter;
     this._settings = { ...DS_CONSTANTS.DEFAULT_SETTINGS, ...settings };
     this._userOffset = (this._settings.userOffset || 0) / 1000; // Convert ms to seconds
-
-    // Set YT video volume to near-silent
-    this._video.volume = Math.max(0.01, (this._settings.ytVolume || 1) / 100);
+    this._originalVolume = this._video ? this._video.volume : 1.0;
 
     // Bind event handlers (so we can remove them later)
     this._boundHandlers = {
@@ -68,6 +68,10 @@ const DSSyncConductor = {
     try {
       this._setState(DS_CONSTANTS.SYNC_BUFFERING);
 
+      // Smoothly fade video volume down to target background level
+      const targetVolume = Math.max(0.01, (this._settings.ytVolume || 1) / 100);
+      this._fadeVolume(targetVolume, 250);
+
       // Get the current video position
       const videoTime = this._video.currentTime;
 
@@ -86,7 +90,7 @@ const DSSyncConductor = {
         await this._video.play();
       }
 
-      // Start the drift correction loop
+      // Start the adaptive drift correction loop
       this._running = true;
       this._lastCheckTime = performance.now();
       this._driftLoop();
@@ -104,6 +108,10 @@ const DSSyncConductor = {
    */
   async stop() {
     this._running = false;
+    if (this._timerId) {
+      clearTimeout(this._timerId);
+      this._timerId = null;
+    }
     if (this._rafId) {
       cancelAnimationFrame(this._rafId);
       this._rafId = null;
@@ -116,9 +124,9 @@ const DSSyncConductor = {
       // Ignore errors during stop
     }
 
-    // Restore video volume
+    // Smoothly restore video volume back to original level
     if (this._video) {
-      this._video.volume = 1.0;
+      await this._fadeVolume(this._originalVolume || 1.0, 250);
     }
 
     this._setState(DS_CONSTANTS.SYNC_IDLE);
@@ -198,24 +206,21 @@ const DSSyncConductor = {
   // ─── Private Methods ───────────────────────────────────────
 
   /**
-   * The main drift correction loop, driven by requestAnimationFrame.
-   * Checks drift every CORRECTION_CHECK_MS.
+   * The main drift correction loop, driven by an adaptive timer.
+   * Runs reliably in both active and background tabs without frame thrashing.
    */
   _driftLoop() {
     if (!this._running) return;
 
-    this._rafId = requestAnimationFrame(() => {
-      const now = performance.now();
-      const elapsed = now - this._lastCheckTime;
+    const absDrift = Math.abs(this._currentDrift);
+    // Dynamic cadence: 150ms during active drift correction, 250ms when synchronized
+    const interval = absDrift > DS_CONSTANTS.DRIFT_WARN ? 150 : 250;
 
-      if (elapsed >= DS_CONSTANTS.CORRECTION_CHECK_MS) {
-        this._lastCheckTime = now;
-        this._checkAndCorrectDrift();
-      }
-
-      // Continue the loop
+    this._timerId = setTimeout(async () => {
+      if (!this._running) return;
+      await this._checkAndCorrectDrift();
       this._driftLoop();
-    });
+    }, interval);
   },
 
   /**
@@ -414,6 +419,34 @@ const DSSyncConductor = {
   },
 
   /**
+   * Smoothly fade video volume between current and target levels.
+   * @param {number} targetVolume - 0.01 to 1.0
+   * @param {number} [durationMs=250] - Transition time in ms
+   * @returns {Promise<void>}
+   */
+  _fadeVolume(targetVolume, durationMs = 250) {
+    if (!this._video) return Promise.resolve();
+    return new Promise((resolve) => {
+      const startVolume = this._video.volume;
+      const startTime = performance.now();
+
+      const step = (now) => {
+        if (!this._video) { resolve(); return; }
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / durationMs);
+        this._video.volume = Math.max(0.01, Math.min(1, startVolume + (targetVolume - startVolume) * progress));
+
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          resolve();
+        }
+      };
+      requestAnimationFrame(step);
+    });
+  },
+
+  /**
    * Utility delay.
    * @param {number} ms
    * @returns {Promise<void>}
@@ -440,6 +473,10 @@ const DSSyncConductor = {
   destroy() {
     // Stop the drift correction loop immediately
     this._running = false;
+    if (this._timerId) {
+      clearTimeout(this._timerId);
+      this._timerId = null;
+    }
     if (this._rafId) {
       cancelAnimationFrame(this._rafId);
       this._rafId = null;
@@ -452,7 +489,7 @@ const DSSyncConductor = {
 
     // Restore video volume
     if (this._video) {
-      try { this._video.volume = 1.0; } catch {};
+      try { this._video.volume = this._originalVolume || 1.0; } catch {};
     }
 
     // Remove listeners before nulling references

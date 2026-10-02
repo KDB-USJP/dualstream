@@ -39,25 +39,30 @@ const DSParser = {
 
   /**
    * Set up listeners for YouTube's SPA navigation.
-   * YouTube fires a custom 'yt-navigate-finish' event on page transitions.
+   * YouTube fires 'yt-navigate-finish' and 'yt-page-data-updated' on transitions.
    */
   _setupNavigationListener() {
-    // YT SPA navigation event
-    document.addEventListener('yt-navigate-finish', () => {
+    this._navHandler = () => {
       DS_UTILS.log('YT navigation detected');
       this._scheduleCheck();
-    });
+    };
 
-    // Also observe URL changes as a fallback
+    // YouTube SPA navigation events
+    document.addEventListener('yt-navigate-finish', this._navHandler);
+    document.addEventListener('yt-page-data-updated', this._navHandler);
+
+    // Browser back/forward navigation
+    window.addEventListener('popstate', this._navHandler);
+
+    // Lightweight URL change fallback without heavy subtree MutationObserver
     let lastUrl = location.href;
-    const urlObserver = new MutationObserver(() => {
+    this._urlPollInterval = setInterval(() => {
       if (location.href !== lastUrl) {
         lastUrl = location.href;
-        DS_UTILS.log('URL change detected');
+        DS_UTILS.log('URL change detected via poll');
         this._scheduleCheck();
       }
-    });
-    urlObserver.observe(document.body, { childList: true, subtree: true });
+    }, 1000);
   },
 
   /**
@@ -97,7 +102,7 @@ const DSParser = {
   _waitForDescription() {
     return new Promise((resolve) => {
       let attempts = 0;
-      const maxAttempts = 30; // 30 * 500ms = 15 seconds max wait
+      const maxAttempts = 25; // 25 * 300ms = 7.5 seconds max wait
 
       const check = () => {
         // Try multiple selectors (YT changes their DOM occasionally)
@@ -118,14 +123,14 @@ const DSParser = {
 
         attempts++;
         if (attempts < maxAttempts) {
-          setTimeout(check, 500);
+          setTimeout(check, 300);
         } else {
           resolve(null);
         }
       };
 
-      // Start checking after a brief delay
-      setTimeout(check, 300);
+      // Check immediately first; if not found, schedule retry
+      check();
     });
   },
 
@@ -216,9 +221,19 @@ const DSParser = {
   },
 
   /**
-   * Destroy the parser and clean up observers.
+   * Destroy the parser and clean up observers and listeners.
    */
   destroy() {
+    if (this._urlPollInterval) {
+      clearInterval(this._urlPollInterval);
+      this._urlPollInterval = null;
+    }
+    if (this._navHandler) {
+      document.removeEventListener('yt-navigate-finish', this._navHandler);
+      document.removeEventListener('yt-page-data-updated', this._navHandler);
+      window.removeEventListener('popstate', this._navHandler);
+      this._navHandler = null;
+    }
     if (this._observer) {
       this._observer.disconnect();
       this._observer = null;

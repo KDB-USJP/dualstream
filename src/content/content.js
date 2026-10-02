@@ -26,8 +26,14 @@ const DualStream = {
       onLinkClick: () => this._handleLinkToggle(),
       onRelinkClick: () => this._handleRelink(),
       onOffsetChange: (ms) => this._handleOffsetChange(ms),
+      onVolumeChange: (vol) => this._handleVolumeChange(vol),
       onStreamSelect: (source) => this._handleStreamSelect(source),
     });
+
+    if (this._settings) {
+      DSUI.setOffset(this._settings.userOffset || 0);
+      DSUI.setYtVolume(this._settings.ytVolume || 1);
+    }
 
     // Initialize the parser
     DSParser.init();
@@ -212,6 +218,16 @@ const DualStream = {
   },
 
   /**
+   * Handle volume change from the UI slider.
+   * @param {number} vol - Volume percent (1-100)
+   */
+  _handleVolumeChange(vol) {
+    DSSyncConductor.setYtVolume(vol);
+    this._settings.ytVolume = vol;
+    DS_UTILS.saveSettings({ ytVolume: vol });
+  },
+
+  /**
    * Handle messages from the popup or service worker.
    * @param {object} message
    * @param {Function} sendResponse
@@ -250,6 +266,7 @@ const DualStream = {
     if (changes.ytVolume) {
       const vol = changes.ytVolume.newValue;
       DSSyncConductor.setYtVolume(vol);
+      DSUI.setYtVolume(vol);
       this._settings.ytVolume = vol;
     }
     if (changes.userOffset) {

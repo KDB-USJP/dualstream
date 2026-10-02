@@ -10,6 +10,7 @@ const MCSyncConductor = {
   _observer: null,     // MCPlayerObserver
   _embed: null,        // MCYouTubeEmbed
   _running: false,
+  _timerId: null,
   _rafId: null,
   _lastCheckTime: 0,
   _currentDrift: 0,
@@ -69,7 +70,7 @@ const MCSyncConductor = {
       this._embed.play();
     }
 
-    // Start the drift correction loop
+    // Start the adaptive drift correction loop
     this._running = true;
     this._lastCheckTime = performance.now();
     this._driftLoop();
@@ -79,22 +80,19 @@ const MCSyncConductor = {
   },
 
   /**
-   * The drift correction loop.
+   * The adaptive drift correction loop.
    */
   _driftLoop() {
     if (!this._running) return;
 
-    this._rafId = requestAnimationFrame(() => {
-      const now = performance.now();
-      const elapsed = now - this._lastCheckTime;
+    const absDrift = Math.abs(this._currentDrift);
+    const interval = absDrift > 100 ? 150 : 250;
 
-      if (elapsed >= DS_CONSTANTS.CORRECTION_CHECK_MS) {
-        this._lastCheckTime = now;
-        this._checkAndCorrectDrift();
-      }
-
+    this._timerId = setTimeout(() => {
+      if (!this._running) return;
+      this._checkAndCorrectDrift();
       this._driftLoop();
-    });
+    }, interval);
   },
 
   /**
@@ -169,6 +167,10 @@ const MCSyncConductor = {
    */
   destroy() {
     this._running = false;
+    if (this._timerId) {
+      clearTimeout(this._timerId);
+      this._timerId = null;
+    }
     if (this._rafId) {
       cancelAnimationFrame(this._rafId);
       this._rafId = null;

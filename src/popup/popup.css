@@ -304,6 +304,58 @@ input[type="range"]::-moz-range-thumb {
   transform: translateX(16px);
 }
 
+/* ─── Creator Delimiter Helper ───────────────────────────── */
+.ds-creator-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ds-creator-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ds-input {
+  width: 100%;
+  padding: 6px 10px;
+  background: #181828;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: #e0e0e8;
+  font-size: 11px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.ds-input:focus {
+  border-color: #cc44ff;
+}
+
+.ds-input::placeholder {
+  color: #55556a;
+}
+
+.ds-creator-output-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.ds-creator-output-row .ds-input {
+  background: #0f0f1a;
+  color: #cc44ff;
+  font-size: 10.5px;
+}
+
+.ds-creator-output-row .ds-btn {
+  padding: 6px 12px;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
 /* ─── Footer ─────────────────────────────────────────────── */
 .ds-footer {
   padding: 10px 16px;

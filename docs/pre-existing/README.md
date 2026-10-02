@@ -30,15 +30,6 @@ Common use cases:
 5. Select the cloned `dualstream` directory
 6. The DualStream icon appears in your extensions bar ✓
 
-### Building a Packed Extension (ZIP / CRX)
-To build a clean distribution package ready for the Chrome Web Store or offline distribution:
-```bash
-node scripts/build-package.js
-```
-This generates:
-- **`dist/dualstream-v1.2.0.zip`** — The standard package for direct upload to the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole).
-- **`dist/dualstream/`** — Clean staging folder without development or repository files. To generate a signed `.crx`, open `chrome://extensions`, click **"Pack extension"**, and select this directory.
-
 ## How It Works
 
 ### Direction 1: YouTube → Alternate Audio
@@ -83,11 +74,11 @@ You can include **multiple** `|||url|||` entries in one description. When DualSt
 2. A **"🎧 Link Alternate Audio"** button appears above the video title
 3. Click it — if multiple streams are available, pick one from the popover
 4. DualStream will:
-   - Smoothly fade YouTube video volume to near-silent
+   - Lower the YouTube video volume to near-silent
    - Load the alternate audio source
    - Start both streams playing together, linked in time
-5. Use the controls to adjust timing offset, balance YouTube background volume, or re-link if needed
-6. Click **"Unlink Audio"** to disconnect and smoothly restore normal playback
+5. Use the controls to adjust timing offset or re-link if needed
+6. Click **"Unlink Audio"** to disconnect and restore normal playback
 
 ---
 
@@ -140,7 +131,7 @@ The triple-pipe delimiter (`|||`) was chosen because:
 |||ps://<url> | Human-Readable Label|||   ← with explicit label
 ```
 
-> **Tip:** Drop the `htt` prefix (`ps://` instead of `https://`) to prevent YouTube from auto-shortening your links. DualStream reconstructs the full URL automatically. You can also use the built-in **Creator Delimiter Helper** in the extension popup to generate and copy this format in one click.
+> **Tip:** Drop the `htt` prefix (`ps://` instead of `https://`) to prevent YouTube from auto-shortening your links. DualStream reconstructs the full URL automatically.
 
 ## Settings
 
@@ -155,7 +146,7 @@ Access settings via the extension popup (click the DualStream icon):
 ## Technical Details
 
 - **Manifest V3** — Modern Chrome extension architecture
-- **Drift correction** — Adaptive timer loop checks alignment every 150–250ms, resilient to background tab suspension
+- **Drift correction** — `requestAnimationFrame`-based loop checks alignment every ~200ms
 - **Target latency** — ≤100ms drift between video and audio
 - **Correction strategy:**
   - < 30ms: Perfect, no action

@@ -146,4 +146,49 @@ document.addEventListener('DOMContentLoaded', () => {
       settings: partial,
     });
   }
+
+  // ─── Creator Delimiter Helper ─────────────────────────────
+  const creatorUrl = document.getElementById('creator-url-input');
+  const creatorLabel = document.getElementById('creator-label-input');
+  const creatorResult = document.getElementById('creator-result-input');
+  const creatorCopyBtn = document.getElementById('creator-copy-btn');
+
+  function updateCreatorResult() {
+    let raw = (creatorUrl.value || '').trim();
+    if (!raw) {
+      creatorResult.value = '';
+      return;
+    }
+
+    // Convert https:// or http:// to ps:// or p:// to protect from YT auto-shortening
+    let converted = raw;
+    if (converted.startsWith('https://')) {
+      converted = 'ps://' + converted.slice(8);
+    } else if (converted.startsWith('http://')) {
+      converted = 'p://' + converted.slice(7);
+    } else if (!converted.startsWith('ps://') && !converted.startsWith('p://')) {
+      converted = 'ps://' + converted;
+    }
+
+    const label = (creatorLabel.value || '').trim();
+    if (label) {
+      creatorResult.value = `|||${converted} | ${label}|||`;
+    } else {
+      creatorResult.value = `|||${converted}|||`;
+    }
+  }
+
+  creatorUrl.addEventListener('input', updateCreatorResult);
+  creatorLabel.addEventListener('input', updateCreatorResult);
+
+  creatorCopyBtn.addEventListener('click', () => {
+    if (!creatorResult.value) return;
+    navigator.clipboard.writeText(creatorResult.value).then(() => {
+      const originalText = creatorCopyBtn.textContent;
+      creatorCopyBtn.textContent = 'Copied!';
+      setTimeout(() => {
+        creatorCopyBtn.textContent = originalText;
+      }, 1500);
+    });
+  });
 });

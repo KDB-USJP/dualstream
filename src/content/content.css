@@ -417,9 +417,15 @@ html:not([dark]) .dualstream-stream-picker {
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-bottom: 8px;
 }
 
-.dualstream-offset-label {
+.dualstream-control-row:last-child {
+  margin-bottom: 0;
+}
+
+.dualstream-offset-label,
+.dualstream-volume-label {
   font-size: 11px;
   color: var(--ds-text-muted);
   min-width: 85px;
@@ -427,7 +433,8 @@ html:not([dark]) .dualstream-stream-picker {
 }
 
 /* Custom range slider */
-.dualstream-offset-slider {
+.dualstream-offset-slider,
+.dualstream-volume-slider {
   flex: 1;
   -webkit-appearance: none;
   appearance: none;
@@ -438,7 +445,8 @@ html:not([dark]) .dualstream-stream-picker {
   cursor: pointer;
 }
 
-.dualstream-offset-slider::-webkit-slider-thumb {
+.dualstream-offset-slider::-webkit-slider-thumb,
+.dualstream-volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 14px;
@@ -449,12 +457,14 @@ html:not([dark]) .dualstream-stream-picker {
   transition: transform var(--ds-transition), box-shadow var(--ds-transition);
 }
 
-.dualstream-offset-slider::-webkit-slider-thumb:hover {
+.dualstream-offset-slider::-webkit-slider-thumb:hover,
+.dualstream-volume-slider::-webkit-slider-thumb:hover {
   transform: scale(1.2);
   box-shadow: 0 0 8px var(--ds-accent-glow);
 }
 
-.dualstream-offset-slider::-moz-range-thumb {
+.dualstream-offset-slider::-moz-range-thumb,
+.dualstream-volume-slider::-moz-range-thumb {
   width: 14px;
   height: 14px;
   background: var(--ds-accent);

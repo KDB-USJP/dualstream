@@ -75,6 +75,12 @@ const MCPlayerObserver = {
         this._audioElement = newAudios[0];
         DS_UTILS.log('MC Player Observer: <audio> element appeared!');
 
+        // Disconnect observer immediately once found to prevent ongoing DOM overhead
+        if (this._mutationObserver) {
+          this._mutationObserver.disconnect();
+          this._mutationObserver = null;
+        }
+
         this._audioElement.addEventListener('timeupdate', () => {
           this._position = this._audioElement.currentTime;
           this._duration = this._audioElement.duration || 0;

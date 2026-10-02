@@ -16,3 +16,7 @@ package-lock.json
 # Build output
 dist/
 *.zip
+
+# Vibe Context System (Secrets)
+.vibe-vault.key
+.vibe-vault-unlocked.json

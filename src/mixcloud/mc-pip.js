@@ -127,28 +127,38 @@ const MCPiP = {
       this._dragOffset.y = e.clientY - rect.top;
       this._container.classList.add('dualstream-pip-dragging');
       e.preventDefault();
-    });
 
-    document.addEventListener('mousemove', (e) => {
-      if (!this._isDragging) return;
-      const x = e.clientX - this._dragOffset.x;
-      const y = e.clientY - this._dragOffset.y;
+      let rafId = null;
+      const onMouseMove = (ev) => {
+        if (!this._isDragging) return;
+        if (rafId) return;
 
-      // Clamp to viewport
-      const maxX = window.innerWidth - this._container.offsetWidth;
-      const maxY = window.innerHeight - this._container.offsetHeight;
-      this._container.style.left = `${Math.max(0, Math.min(x, maxX))}px`;
-      this._container.style.top = `${Math.max(0, Math.min(y, maxY))}px`;
-      this._container.style.right = 'auto';
-      this._container.style.bottom = 'auto';
-    });
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          const x = ev.clientX - this._dragOffset.x;
+          const y = ev.clientY - this._dragOffset.y;
 
-    document.addEventListener('mouseup', () => {
-      if (this._isDragging) {
+          // Clamp to viewport
+          const maxX = window.innerWidth - this._container.offsetWidth;
+          const maxY = window.innerHeight - this._container.offsetHeight;
+          this._container.style.left = `${Math.max(0, Math.min(x, maxX))}px`;
+          this._container.style.top = `${Math.max(0, Math.min(y, maxY))}px`;
+          this._container.style.right = 'auto';
+          this._container.style.bottom = 'auto';
+        });
+      };
+
+      const onMouseUp = () => {
         this._isDragging = false;
         this._container.classList.remove('dualstream-pip-dragging');
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+        if (rafId) cancelAnimationFrame(rafId);
         this._savePosition();
-      }
+      };
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
     });
   },
 
@@ -169,32 +179,42 @@ const MCPiP = {
       this._container.classList.add('dualstream-pip-resizing');
       e.preventDefault();
       e.stopPropagation();
-    });
 
-    document.addEventListener('mousemove', (e) => {
-      if (!this._isResizing) return;
-      const deltaX = e.clientX - this._resizeStart.x;
-      let newW = Math.max(this.MIN_WIDTH, this._resizeStart.w + deltaX);
-      let newH = newW / this.ASPECT_RATIO;
+      let rafId = null;
+      const onMouseMove = (ev) => {
+        if (!this._isResizing) return;
+        if (rafId) return;
 
-      if (newH < this.MIN_HEIGHT) {
-        newH = this.MIN_HEIGHT;
-        newW = newH * this.ASPECT_RATIO;
-      }
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          const deltaX = ev.clientX - this._resizeStart.x;
+          let newW = Math.max(this.MIN_WIDTH, this._resizeStart.w + deltaX);
+          let newH = newW / this.ASPECT_RATIO;
 
-      this._container.style.width = `${newW}px`;
-      this._container.style.height = 'auto';
-      if (this._videoContainer) {
-        this._videoContainer.style.height = `${newH}px`;
-      }
-    });
+          if (newH < this.MIN_HEIGHT) {
+            newH = this.MIN_HEIGHT;
+            newW = newH * this.ASPECT_RATIO;
+          }
 
-    document.addEventListener('mouseup', () => {
-      if (this._isResizing) {
+          this._container.style.width = `${newW}px`;
+          this._container.style.height = 'auto';
+          if (this._videoContainer) {
+            this._videoContainer.style.height = `${newH}px`;
+          }
+        });
+      };
+
+      const onMouseUp = () => {
         this._isResizing = false;
         this._container.classList.remove('dualstream-pip-resizing');
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+        if (rafId) cancelAnimationFrame(rafId);
         this._savePosition();
-      }
+      };
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
     });
   },
 

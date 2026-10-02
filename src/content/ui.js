@@ -14,6 +14,8 @@ const DSUI = {
   _statusDot: null,
   _offsetSlider: null,
   _offsetLabel: null,
+  _volumeSlider: null,
+  _volumeLabel: null,
   _driftDisplay: null,
   _expanded: false,
   _sourceInfo: null,
@@ -22,6 +24,7 @@ const DSUI = {
   _onLinkClick: null,
   _onRelinkClick: null,
   _onOffsetChange: null,
+  _onVolumeChange: null,
   _onStreamSelect: null,
   _onToggleExpand: null,
 
@@ -31,11 +34,13 @@ const DSUI = {
    * @param {Function} callbacks.onLinkClick - Called when "Link" button is clicked
    * @param {Function} callbacks.onRelinkClick - Called when "Re-link" button is clicked
    * @param {Function} callbacks.onOffsetChange - Called with offset in ms
+   * @param {Function} callbacks.onVolumeChange - Called with YT volume percent
    */
   init(callbacks = {}) {
     this._onLinkClick = callbacks.onLinkClick || (() => {});
     this._onRelinkClick = callbacks.onRelinkClick || (() => {});
     this._onOffsetChange = callbacks.onOffsetChange || (() => {});
+    this._onVolumeChange = callbacks.onVolumeChange || (() => {});
     this._onStreamSelect = callbacks.onStreamSelect || (() => {});
 
     this._injectUI();
@@ -202,6 +207,19 @@ const DSUI = {
   },
 
   /**
+   * Update the YT background volume slider and label.
+   * @param {number} volumePercent - 1-100
+   */
+  setYtVolume(volumePercent) {
+    if (this._volumeSlider) {
+      this._volumeSlider.value = volumePercent;
+    }
+    if (this._volumeLabel) {
+      this._volumeLabel.textContent = `YT Vol: ${volumePercent}%`;
+    }
+  },
+
+  /**
    * Get the player bar element (for mounting audio adapters).
    * @returns {HTMLElement}
    */
@@ -245,6 +263,8 @@ const DSUI = {
       this._driftDisplay = this._container.querySelector('.dualstream-drift-value');
       this._offsetSlider = this._container.querySelector('.dualstream-offset-slider');
       this._offsetLabel = this._container.querySelector('.dualstream-offset-label');
+      this._volumeSlider = this._container.querySelector('.dualstream-volume-slider');
+      this._volumeLabel = this._container.querySelector('.dualstream-volume-label');
 
       // Bind events
       this._bindEvents();
@@ -318,6 +338,11 @@ const DSUI = {
             <input type="range" class="dualstream-offset-slider" 
                    min="-500" max="500" value="0" step="10">
           </div>
+          <div class="dualstream-control-row">
+            <span class="dualstream-volume-label">YT Vol: 1%</span>
+            <input type="range" class="dualstream-volume-slider" 
+                   min="1" max="100" value="1" step="1" title="YouTube video background volume">
+          </div>
         </div>
 
         <!-- Audio player mount point -->
@@ -369,6 +394,17 @@ const DSUI = {
           this._offsetLabel.textContent = `Offset: ${DS_UTILS.formatDrift(offsetMs)}`;
         }
         this._onOffsetChange(offsetMs);
+      });
+    }
+
+    // Volume slider
+    if (this._volumeSlider) {
+      this._volumeSlider.addEventListener('input', (e) => {
+        const vol = parseInt(e.target.value, 10);
+        if (this._volumeLabel) {
+          this._volumeLabel.textContent = `YT Vol: ${vol}%`;
+        }
+        this._onVolumeChange(vol);
       });
     }
 
